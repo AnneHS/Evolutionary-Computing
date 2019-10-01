@@ -98,4 +98,4 @@ if run_mode == "train":
     avgs = pd.concat([means,stdvs], axis=1)
 
     # CHANGE THIS ACCORDING TO ENEMY SELECTION
-    avgs.to_csv("DEAP_specialist_enemy_{}TESTTESTTEST.csv".format(ENEMY))
+    avgs.to_csv("DEAP_specialist_enemy_{}.csv".format(ENEMY))
