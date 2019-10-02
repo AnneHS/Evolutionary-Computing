@@ -63,6 +63,7 @@ def main():
     stats.register("std", np.std)
     stats.register("min", np.min)
     stats.register("max", np.max)
+    stats.register("best", np.argmax)
     pop, logbook = algorithms.eaGenerateUpdate(toolbox, ngen=NGEN, stats=stats, halloffame=hof)
     return pop, logbook
 
@@ -79,7 +80,7 @@ if run_mode == "train":
         print("Run {} of {} finished!".format(i, ENEMY))
         print('\nExecution time: ' + str(round((fim - ini) / 60.0)) + ' minutes \n')
 
-        gen, fit_avg, fit_max = logbook.select("gen", "avg", "max")
+        gen, fit_avg, fit_max, best = logbook.select("gen", "avg", "max", "best")
         print("\nfit_avg\n")
         print(fit_avg)
         print("\nfit_max\n")
@@ -87,8 +88,9 @@ if run_mode == "train":
 
         stats = stats.append(list(zip(gen, fit_avg, fit_max)))
 
-        best = np.argmax(fit_avg)
-        np.savetxt(experiment_name + '/best/run_' + str(i) + '.txt', pop[best])
+        if not os.path.exists(experiment_name + '/best'):
+            os.makedirs(experiment_name + '/best')
+        np.savetxt(experiment_name + '/best/run_' + str(i) + '.txt', best)
 
     life = pd.DataFrame(life_stats)
     life_agg = life.groupby(life.index // LAMBDA).mean()
