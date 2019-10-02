@@ -11,6 +11,8 @@ import time
 import pandas as pd
 plt.style.use('ggplot')
 
+os.environ["SDL_VIDEODRIVER"] = "dummy"
+
 experiment_name = "DEAP"
 if not os.path.exists(experiment_name):
     os.makedirs(experiment_name)
@@ -84,6 +86,9 @@ if run_mode == "train":
         print(fit_max)
 
         stats = stats.append(list(zip(gen, fit_avg, fit_max)))
+
+        best = np.argmax(fit_avg)
+        np.savetxt(experiment_name + '/best/run_' + str(i) + '.txt', pop[best])
 
     life = pd.DataFrame(life_stats)
     life_agg = life.groupby(life.index // LAMBDA).mean()
