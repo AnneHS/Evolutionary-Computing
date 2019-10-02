@@ -79,7 +79,7 @@ if run_mode == "train":
         print("Run {} of {} finished!".format(i, ENEMY))
         print('\nExecution time: ' + str(round((fim - ini) / 60.0)) + ' minutes \n')
 
-        gen, fit_avg, fit_max, best = logbook.select("gen", "avg", "max", "best")
+        gen, fit_avg, fit_max = logbook.select("gen", "avg", "max")
 
         stats = stats.append(list(zip(gen, fit_avg, fit_max)))
 
