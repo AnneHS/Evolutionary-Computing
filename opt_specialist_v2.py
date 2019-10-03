@@ -33,12 +33,12 @@ env = Environment(experiment_name=experiment_name,
 IND_SIZE = (env.get_num_sensors()+1)*10+(10+1)*5
 RUN_MODE = "train"
 NGEN = 5
-NRUN = 2
+NRUN = 3
 
 UPPER_LIMIT = 1.0
 LOWER_LIMIT = -1.0
 
-m = 10
+#m = 10
 #m = eval(m.split()[0])
 MU = 10
 MUTATION_RATE = 0.1
@@ -67,7 +67,9 @@ def doomsday(pop, pop_fitness, gen):
 
 # calculates the fitness of a single weight matrix
 def fitness(single_weight_matrix):
+    global life_stats
     f,e,p,t = env.play(pcont=single_weight_matrix)
+    life_stats.append([p, e])
     return f
 
 
@@ -78,11 +80,8 @@ def incest_check(parent_1, parent_2):
 
 # sets limit on weights
 def limit(x):
-    if x > UPPER_LIMIT:
-        x = UPPER_LIMIT
-    if x < LOWER_LIMIT:
-        x = LOWER_LIMIT
-    return x
+   return np.clip(x,LOWER_LIMIT,UPPER_LIMIT)
+
 
 
 # merges the populations
@@ -173,22 +172,33 @@ def tournament_selection(pop, pop_fitness):
 if RUN_MODE == "train":
 
     stats = pd.DataFrame()
-    for run in range(NRUN):
+    life_stats = []
+
+    for run in range(1, NRUN+1):
 
         fit_avg = []
         fit_max = []
         gen = []
+        current_best_contr = None
+        current_best_fit = 0
+
         # ini = time.time()
         # initialize population
         pop = np.random.uniform(LOWER_LIMIT, UPPER_LIMIT, (MU, IND_SIZE))
         pop_fitness = pop_evaluation(pop)
-        for i in range(1, NGEN):
+        for i in range(1, NGEN+1):
             new_pop, new_pop_fitness = reproduction(pop, pop_fitness)
             pop, pop_fitness = survivor_selection(new_pop, new_pop_fitness)
             doomsday(pop, pop_fitness, i)
+            if np.max(pop_fitness) > current_best_fit:
+                current_best_fit = np.max(pop_fitness)  # best solution in generation
+                current_best_contr = pop[np.argmax(pop_fitness)]
+
             gen.append(i)
             fit_avg.append(pop_fitness.mean())
             fit_max.append(pop_fitness.max())
+
+
         # fim = time.time()  # prints total execution time for experiment
         # print('\nExecution time: ' + str(round((fim - ini) / 60.0)) + ' minutes \n')
 
@@ -196,13 +206,21 @@ if RUN_MODE == "train":
         #print(-np.mean(pop_fitness))
         stats = stats.append(list(zip(gen, fit_avg, fit_max)))
 
+        if not os.path.exists(experiment_name + '/best'):
+            os.makedirs(experiment_name + '/best')
+        np.savetxt(experiment_name + '/best/run_' + str(run) + '.txt', current_best_contr)
+
+    life = pd.DataFrame(life_stats)
+    life_agg = life.groupby(life.index // MU).mean()
+    life_agg.columns = ["player_life", "enemy_life"]
     stats.columns = ["gen", "fit_avg", "fit_max"]
-    means = stats.groupby("gen").agg(np.mean)
-    stdvs = stats.groupby("gen").agg(np.std)
-    stdvs.columns = ["fit_avg_std", "fit_max_std"]
-    avg_stats = pd.concat([means, stdvs], axis=1)
-    print("avg_stats")
-    print(avg_stats)
+    stats.reset_index(drop=True, inplace=True)
+    avg_stats = pd.concat([stats, life_agg], axis=1)
+
+    means = avg_stats.groupby("gen").agg(np.mean)
+    stdvs = avg_stats.groupby("gen").agg(np.std)
+    stdvs.columns = ["fit_avg_std", "fit_max_std", "player_life_std", "enemy_life_std"]
+    avgs = pd.concat([means, stdvs], axis=1)
 
     # CHANGE THIS ACCORDING TO ENEMY SELECTION
-    #avg_stats.to_csv(f"DEAP_specialist_enemy_{ENEMY}_LOG.csv")
+    avgs.to_csv("EA_specialist_enemy_{}.csv".format(ENEMY))
