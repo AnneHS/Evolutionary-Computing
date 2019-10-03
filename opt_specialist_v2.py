@@ -1,24 +1,27 @@
+##############################################################
+#  THIS SCRIPT IS USED TO RUN THE ALREADY TUNED EA ALGORITHM #
+# > IT TRACKS ALL STATS AND SAVES THEM TO CSV                #
+##############################################################
+
+
 import sys
 sys.path.insert(0, "evoman")
-
 import os
 import pandas as pd
-# avoid print statements for SPOT
-#os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "hide"
-# do not display pygame window
-os.environ["SDL_VIDEODRIVER"] = "dummy"
-
 from demo_controller import player_controller
 from evoman.environment import Environment
 import numpy as np
-# import time
 
+# do not display pygame window
+os.environ["SDL_VIDEODRIVER"] = "dummy"
 
 experiment_name = "EA"
 if not os.path.exists(experiment_name):
     os.makedirs(experiment_name)
 
+# SPECIFY ENEMY/ENEMIES
 ENEMY = 8
+
 env = Environment(experiment_name=experiment_name,
                   enemies=[ENEMY],
                   playermode="ai",
@@ -31,7 +34,6 @@ env = Environment(experiment_name=experiment_name,
 
 
 IND_SIZE = (env.get_num_sensors()+1)*10+(10+1)*5
-RUN_MODE = "train"
 NGEN = 20
 NRUN = 10
 
@@ -48,7 +50,6 @@ K = 100
 DOOMSDAY_RATIO = 0.8209
 
 
-# ??????????
 # implements diversity control
 def doomsday(pop, pop_fitness, gen):
     values, count = np.unique(pop_fitness, return_counts=True)
@@ -83,7 +84,6 @@ def limit(x):
    return np.clip(x,LOWER_LIMIT,UPPER_LIMIT)
 
 
-
 # merges the populations
 def merge_pops(pop, pop_fitness, offspring, offspring_fitness):
     return np.r_[pop, offspring], np.r_[pop_fitness, offspring_fitness]
@@ -98,7 +98,6 @@ def mutation(single_weight_matrix):
 
 # normalizes a single fitness value
 def norm(single_fitness_value, pop_fitness):
-    # ??????????
     x_norm = (single_fitness_value - np.min(pop_fitness)) / float(np.max(pop_fitness) - np.min(pop_fitness))
     return x_norm
 
@@ -108,7 +107,6 @@ def pop_evaluation(pop):
     return np.array(list(map(lambda y: fitness(y), pop)))
 
 
-# ??????????
 # implements reproduction
 def reproduction(pop, pop_fitness):
     total_offspring = np.zeros((0, IND_SIZE))
@@ -158,7 +156,6 @@ def tournament_selection(pop, pop_fitness):
     highest_fitness = 0
     winner_index = 0
     for k in range(K):
-        # ??????????
         selection = np.random.randint(0, MU)
         if (highest_fitness == 0) or (pop_fitness[selection] > highest_fitness):
             highest_fitness = pop_fitness[selection]
@@ -167,52 +164,53 @@ def tournament_selection(pop, pop_fitness):
             break
     return pop[winner_index]
 
+if __name__ == "__main__":
 
-
-if RUN_MODE == "train":
-
+    # initialize logging PER RUN
     stats = pd.DataFrame()
     life_stats = []
 
     for run in range(1, NRUN+1):
         print("Starting run {}...".format(run))
 
+        # initialize logging PER GENERATION
         fit_avg = []
         fit_max = []
         gen = []
         current_best_contr = None
         current_best_fit = 0
 
-        # ini = time.time()
         # initialize population
         pop = np.random.uniform(LOWER_LIMIT, UPPER_LIMIT, (MU, IND_SIZE))
         pop_fitness = pop_evaluation(pop)
+
         for i in range(1, NGEN+1):
             print("Starting generation {}...".format(i))
 
             new_pop, new_pop_fitness = reproduction(pop, pop_fitness)
             pop, pop_fitness = survivor_selection(new_pop, new_pop_fitness)
             doomsday(pop, pop_fitness, i)
+
+            # check if new max fitness has been reached >>> store
             if np.max(pop_fitness) > current_best_fit:
                 current_best_fit = np.max(pop_fitness)  # best solution in generation
                 current_best_contr = pop[np.argmax(pop_fitness)]
 
+            # log stats PER GEN
             gen.append(i)
             fit_avg.append(pop_fitness.mean())
             fit_max.append(pop_fitness.max())
 
-
-        # fim = time.time()  # prints total execution time for experiment
-        # print('\nExecution time: ' + str(round((fim - ini) / 60.0)) + ' minutes \n')
-
-        # required print statement for SPOT
-        #print(-np.mean(pop_fitness))
+        # log stats PER RUN
         stats = stats.append(list(zip(gen, fit_avg, fit_max)))
 
+        # save best controller of the current run
         if not os.path.exists(experiment_name + '/best'):
             os.makedirs(experiment_name + '/best')
         np.savetxt(experiment_name + '/best/run_' + str(run) + '.txt', current_best_contr)
 
+
+    # data reformatting and aggregation
     life = pd.DataFrame(life_stats)
     life_agg = life.groupby(life.index // MU).mean()
     life_agg.columns = ["player_life", "enemy_life"]
@@ -225,5 +223,5 @@ if RUN_MODE == "train":
     stdvs.columns = ["fit_avg_std", "fit_max_std", "player_life_std", "enemy_life_std"]
     avgs = pd.concat([means, stdvs], axis=1)
 
-    # CHANGE THIS ACCORDING TO ENEMY SELECTION
+    # write to disk
     avgs.to_csv("EA_specialist_enemy_{}.csv".format(ENEMY))
