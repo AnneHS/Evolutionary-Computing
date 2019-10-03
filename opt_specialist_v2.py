@@ -6,7 +6,7 @@ import pandas as pd
 # avoid print statements for SPOT
 #os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "hide"
 # do not display pygame window
-#os.environ["SDL_VIDEODRIVER"] = "dummy"
+os.environ["SDL_VIDEODRIVER"] = "dummy"
 
 from demo_controller import player_controller
 from evoman.environment import Environment
@@ -18,7 +18,7 @@ experiment_name = "EA"
 if not os.path.exists(experiment_name):
     os.makedirs(experiment_name)
 
-ENEMY = 3
+ENEMY = 8
 env = Environment(experiment_name=experiment_name,
                   enemies=[ENEMY],
                   playermode="ai",
@@ -32,20 +32,20 @@ env = Environment(experiment_name=experiment_name,
 
 IND_SIZE = (env.get_num_sensors()+1)*10+(10+1)*5
 RUN_MODE = "train"
-NGEN = 5
-NRUN = 3
+NGEN = 20
+NRUN = 10
 
 UPPER_LIMIT = 1.0
 LOWER_LIMIT = -1.0
 
 #m = 10
 #m = eval(m.split()[0])
-MU = 10
-MUTATION_RATE = 0.1
-CROSSOVER_RATE = 0.5
+MU = 100
+MUTATION_RATE = 0.0206
+CROSSOVER_RATE = 0.9347
 # tournament size
-K = 2
-DOOMSDAY_RATIO = 0.5
+K = 100
+DOOMSDAY_RATIO = 0.8209
 
 
 # ??????????
@@ -175,6 +175,7 @@ if RUN_MODE == "train":
     life_stats = []
 
     for run in range(1, NRUN+1):
+        print("Starting run {}...".format(run))
 
         fit_avg = []
         fit_max = []
@@ -187,6 +188,8 @@ if RUN_MODE == "train":
         pop = np.random.uniform(LOWER_LIMIT, UPPER_LIMIT, (MU, IND_SIZE))
         pop_fitness = pop_evaluation(pop)
         for i in range(1, NGEN+1):
+            print("Starting generation {}...".format(i))
+
             new_pop, new_pop_fitness = reproduction(pop, pop_fitness)
             pop, pop_fitness = survivor_selection(new_pop, new_pop_fitness)
             doomsday(pop, pop_fitness, i)
