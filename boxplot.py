@@ -1,14 +1,11 @@
 import sys
 sys.path.insert(0, 'evoman')
-
 from matplotlib import pyplot as plt
 import pandas as pd
 import numpy as np
-import os
 from demo_controller import player_controller
 from evoman.environment import Environment
 plt.style.use('ggplot')
-
 
 RUNS = 10
 experiment_name = "halloffame"
@@ -32,7 +29,6 @@ if __name__ == "__main__":
                               enemymode="static",
                               level=2,
                               speed="fastest",
-                              # avoid print statements for SPOT
                               logs="off")
 
             for run in range(0,RUNS):
@@ -44,5 +40,6 @@ if __name__ == "__main__":
     #STORE IN PANDAS WIDE DF
     hof = pd.DataFrame(best_fit, columns=["DEAP_3", "DEAP_7", "DEAP_8", "EA_3", "EA_7" ,"EA_8" ])
 
-    hof[["DEAP_3", "DEAP_7"]].boxplot()
+    hof.boxplot()
+    hof.to_csv("hall_of_fame.csv")
     #BOXPLOTS
