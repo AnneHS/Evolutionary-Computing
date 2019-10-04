@@ -51,7 +51,7 @@ if __name__ == "__main__":
                                           "EA enemy 8"])
     hof.to_csv("hall_of_fame.csv")
 
-    plt.rcParams.update({"font.size": 8})
+    plt.rcParams.update({"font.size": 6})
     hof.boxplot()
     plt.ylabel("Maximum fitness")
     plt.savefig("boxplot.png")
