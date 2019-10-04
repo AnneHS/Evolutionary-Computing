@@ -20,9 +20,8 @@ fig, ax = plt.subplots(2, len(enemies), sharey = "row", sharex="col", figsize=(1
 fig.subplots_adjust(hspace=0.1, wspace=0.1)
 #ax = ax.flatten()
 ax[1,1].set(xlabel = "Generation")
-fig.text(0.07, 0.5, "Fitness" ,va="center", rotation="vertical")
-
-
+fig.text(0.07, 0.70, "Fitness" ,va="center", rotation="vertical", fontsize=14)
+fig.text(0.07, 0.30, "Energy Points" ,va="center", rotation="vertical", fontsize=14)
 
 for i, enemy in enumerate(enemies):
     ax[0, i].plot(stats[i].index[:20], stats[i].fit_avg[:20], label="EA avg fitness")
