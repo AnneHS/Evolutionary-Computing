@@ -47,11 +47,9 @@ if __name__ == "__main__":
                 elif method_idx == 1:
                     best_fit[run][2 + method_idx + enemy_idx] = fit
 
-    hof = pd.DataFrame(best_fit, columns=["DEAP enemy 3", "DEAP enemy 7", "DEAP enemy 8", "EA enemy 3", "EA enemy 7",
-                                          "EA enemy 8"])
+    hof = pd.DataFrame(best_fit, columns=["DEAP e3", "DEAP e7", "DEAP e8", "EA e3", "EA e7", "EA e8"])
     hof.to_csv("hall_of_fame.csv")
-
-    plt.rcParams.update({"font.size": 6})
+    
     hof.boxplot()
     plt.ylabel("Maximum fitness")
     plt.savefig("boxplot.png")
