@@ -24,17 +24,17 @@ fig.text(0.07, 0.70, "Fitness" ,va="center", rotation="vertical", fontsize=14)
 fig.text(0.07, 0.30, "Energy Points" ,va="center", rotation="vertical", fontsize=14)
 
 for i, enemy in enumerate(enemies):
-    ax[0, i].plot(stats[i].index[:20], stats[i].fit_avg[:20], label="EA avg fitness")
-    ax[0, i].plot(stats[i].index[20:], stats[i].fit_avg[20:], label="DEAP avg fitness")
+    ax[0, i].plot(stats[i].index[:20], stats[i].fit_avg[:20], label="SPO-EA avg fitness")
+    ax[0, i].plot(stats[i].index[20:], stats[i].fit_avg[20:], label="CMA-ES avg fitness")
 
-    ax[0, i].plot(stats[i].index[:20], stats[i].fit_max[:20], label="EA max fitness")
-    ax[0, i].plot(stats[i].index[20:], stats[i].fit_max[20:], label="DEAP max fitness")
+    ax[0, i].plot(stats[i].index[:20], stats[i].fit_max[:20], label="SPO-EA max fitness")
+    ax[0, i].plot(stats[i].index[20:], stats[i].fit_max[20:], label="CMA-ES max fitness")
 
-    ax[1, i].plot(stats[i].index[:20], stats[i].player_life[:20], label="EA player life")
-    ax[1, i].plot(stats[i].index[20:], stats[i].player_life[20:], label="DEAP player life")
+    ax[1, i].plot(stats[i].index[:20], stats[i].player_life[:20], label="SPO-EA player life")
+    ax[1, i].plot(stats[i].index[20:], stats[i].player_life[20:], label="CMA-ES player life")
 
-    ax[1, i].plot(stats[i].index[:20], stats[i].enemy_life[:20], label="EA enemy life")
-    ax[1, i].plot(stats[i].index[20:], stats[i].enemy_life[20:], label="DEAP enemy life")
+    ax[1, i].plot(stats[i].index[:20], stats[i].enemy_life[:20], label="SPO-EA enemy life")
+    ax[1, i].plot(stats[i].index[20:], stats[i].enemy_life[20:], label="CMA-ES enemy life")
 
 
 
