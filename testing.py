@@ -11,8 +11,8 @@ experiment_name = "test_generalist"
 
 
 def fitness(single_weight_matrix):
-    f,e,p,t = env.play(pcont=single_weight_matrix)
-    return f
+    f,p,e,t = env.play(pcont=single_weight_matrix)
+    return p,e
 
 
 if __name__ == "__main__":
@@ -21,26 +21,30 @@ if __name__ == "__main__":
     log = []
 
     for run in range(1, 11):
-        ctr = np.loadtxt(f'./GENERALIST/CMA/run_{run}.txt')
+        ctr = np.loadtxt(f'./GENERALIST/EA/run_{run}.txt')
 
-        env = Environment(experiment_name=experiment_name,
-                          enemies=enemies,
-                          multiplemode='yes',
-                          playermode="ai",
-                          player_controller=player_controller(),
-                          enemymode="static",
-                          level=2,
-                          speed="fastest",
-                          logs="off")
+        gain = 0
+        for enemy in enemies:
+            env = Environment(experiment_name=experiment_name,
+                              enemies=[enemy],
+                              # multiplemode='yes',
+                              playermode="ai",
+                              player_controller=player_controller(),
+                              enemymode="static",
+                              level=2,
+                              speed="fastest",
+                              logs="off")
 
-        fit = 0
-        for i in range(5):
-            fit += float(fitness(ctr))
-            fit /= 5
+            for i in range(5):
+                p, e = fitness(ctr)
+                g = float(p) - float(e)
+                gain += g
 
-        log.append(fit)
-        top10 = pd.DataFrame(log)
-        top10.to_csv('CMA_generalist_10.csv')
+            gain /= 5
+            print(gain)
+            log.append(gain)
+            top10 = pd.DataFrame(log)
+            top10.to_csv('EA_generalist_gain.csv')
 
 
 
