@@ -7,6 +7,9 @@ from demo_controller import player_controller
 from evoman.environment import Environment
 plt.style.use('ggplot')
 
+# do not display pygame window
+os.environ["SDL_VIDEODRIVER"] = "dummy"
+
 experiment_name = "test_generalist"
 
 
@@ -43,10 +46,11 @@ if __name__ == "__main__":
             gain_enemy /= 5
 
             gain += gain_enemy
-            print(gain)
-            log.append(gain)
-            top10 = pd.DataFrame(log)
-            top10.to_csv('EA_generalist_gain.csv')
+            
+        log.append(gain)
+        
+    top10 = pd.DataFrame(log)
+    top10.to_csv('EA_generalist_gain.csv')
 
 
 
