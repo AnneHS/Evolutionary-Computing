@@ -7,6 +7,7 @@ from demo_controller import player_controller
 from evoman.environment import Environment
 plt.style.use('ggplot')
 
+import os
 # do not display pygame window
 os.environ["SDL_VIDEODRIVER"] = "dummy"
 
