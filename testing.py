@@ -51,6 +51,3 @@ if __name__ == "__main__":
         
     top10 = pd.DataFrame(log)
     top10.to_csv('EA_generalist_gain.csv')
-
-
-
