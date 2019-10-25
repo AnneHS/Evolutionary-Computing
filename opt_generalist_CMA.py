@@ -53,7 +53,7 @@ def evalFitness(single_weight_matrix):
 
 
 def main():
-    # DEAP CONFIGURATION
+    # CMA-ES CONFIGURATION
     creator.create("FitnessMax", base.Fitness, weights=(1.0,))
     creator.create("Individual", list, fitness=creator.FitnessMax)
 
