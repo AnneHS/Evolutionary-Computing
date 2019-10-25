@@ -35,12 +35,14 @@ if __name__ == "__main__":
                               speed="fastest",
                               logs="off")
 
+            gain_enemy = 0
             for i in range(5):
                 p, e = fitness(ctr)
                 g = float(p) - float(e)
-                gain += g
+                gain_enemy += g
+            gain_enemy /= 5
 
-            gain /= 5
+            gain += gain_enemy
             print(gain)
             log.append(gain)
             top10 = pd.DataFrame(log)
