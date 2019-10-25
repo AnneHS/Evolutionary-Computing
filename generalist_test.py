@@ -1,6 +1,6 @@
 import sys
-
 sys.path.insert(0, "evoman")
+
 from matplotlib import pyplot as plt
 import pandas as pd
 import numpy as np
@@ -28,6 +28,8 @@ if __name__ == "__main__":
     log = []
 
     for run in range(1, 11):
+        
+        # load best network
         ctr = np.loadtxt(f"./GENERALIST/EA/best/run_{run}.txt")
 
         gain = 0
@@ -42,6 +44,7 @@ if __name__ == "__main__":
                               speed="fastest",
                               logs="off")
 
+            # stats per enemy
             player_life = 0
             enemy_life = 0
             for i in range(5):
